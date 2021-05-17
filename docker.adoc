@@ -1,0 +1,55 @@
+= Docker Basics
+
+Pull an image:
+
+```
+docker image pull ubuntu
+```
+
+
+Run an interactive container:
+
+```
+docker run -it -d ubuntu
+```
+
+Run an interactive container daemonized:
+
+```
+docker run -it -d ubuntu
+```
+
+Attach to a running container:
+```
+docker attach <id>
+```
+
+To detach without exiting the container: 
+
+`<ctrl-p><ctrl-q>`
+
+Run a daemonized container with port forwarding:
+
+```
+docker run -it -d -p 8080:80 nginx
+```
+
+== Image Creation/Management
+
+Create an image on a running container:
+
+```
+docker commit <id> <owner>/<name>:<version>
+```
+
+.example
+```
+docker commit 871d seddy/coolwebapp:1.0
+```
+
+Create an image from a running container with an entrypoint:
+
+```
+docker commit 871d --change='ENTRYPOINT ["apachectl", "-DFOREGROUND"]' seddy/coolwebapp:1.1
+```
+

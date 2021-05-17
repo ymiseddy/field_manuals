@@ -2,3 +2,9 @@
 
 == Javascript/UI Field Manuals
 - link:eel_vue_vite.adoc[Desktop App with Vue, Eel and Vite]
+
+== Devops Related
+
+- link:docker.adoc[Docker Commands]
+- link:ansible.adoc[Ansible] (in the works)
+- link:kubernetes.adoc[Kubernetes] (coming soon)
