@@ -1,0 +1,178 @@
+= EEL/Vite/Vue Desktop App
+
+This guide covers a quick start of building a new "desktop" app using Python with the EEL library, VueJs, and Vite for compilation.
+
+
+== Intitial App Setup
+
+Create the directory structure where app is the location of your application:
+
+```
+/app/htsrc
+/app/htdist
+```
+
+The `/app/htsrc` folder is where the source code (javascript/typescript) of the front-end will go.
+
+The `app/htdist` folder is where the compiled version of the front-end code will go.
+
+== Create a python virtual environment
+
+In a terminal in the app/ folder type:
+```
+python -m venv .venv
+```
+
+This command will create a new python virtual environment so you can track dependencies of your python project.
+
+You can now open your application folder in your python ide of choice.  Be sure to set the python interpreter to the location of your virtual environment.
+
+== Create Vue Project
+
+Change to the `htsrc/` directory and type:
+```
+npm init @vitejs/app .
+```
+
+Follow the prompts of this command to scaffold out your initial project.
+
+== Set the Vite build directory
+
+Edit the `vite.config.js` file and add a build section to the config with the `outDir` value set to the distribution location.  
+
+Example:
+```
+import { defineConfig } from 'vite'
+import vue from '@vitejs/plugin-vue'
+
+// https://vitejs.dev/config/
+export default defineConfig({
+  build: {
+    outDir: '../htdist/'
+  },
+  plugins: [vue()]
+})
+
+```
+
+Since the dist directory is outside of the application root, it is helpful to tell vite to clear out this directory each time it builds.
+
+To do this, modify the `package.json` file's build step - and add the `--emptyOutDir` parameter:
+
+```
+
+  "name": "my-application",
+  "version": "0.0.0",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build --emptyOutDir",
+    "serve": "vite preview"
+  },
+  "dependencies": {
+    "vue": "^3.0.5"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^1.2.2",
+    "@vue/compiler-sfc": "^3.0.5",
+    "vite": "^2.3.0"
+  }
+}
+
+```
+
+
+Install all npm dependencies:
+
+```
+npm install
+```
+
+Open the index.html file in the `htsrc/' folder and add a script tag to import the `eel` library.  This line should go before the `main.js` script tag.  This is an example of the resulting file:
+
+.index.html
+```
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vite App</title>
+  </head>
+  <body>
+    <div id="app"></div>
+
+    <script type="text/javascript" src="/eel.js"></script>
+
+    <script type="module" src="/src/main.js"></script> 
+  </body>
+</html>
+
+
+```
+
+== Test the build step
+
+At this point, run the following to ensure the build step works:
+
+```
+npm run build
+```
+
+If everything works, you should have a basic VueJS web applciation in the `/app/htdist' folder.  Verify this folder contains an `index.html` file, `assets/` folder` and a favicon.ico file.
+
+== Python Application
+
+Change to the root of the `/app` (or wherever you're saving yoru application).
+
+You may want to ensure your virtual environment is activated:
+
+```
+./.venv/Scripts/activate
+```
+
+If this works, your command prompt should change to indicate you are working in a virtual environment.
+
+Install the eel library with:
+
+```
+pip install eel
+```
+
+If you want to package the file as a windows executable, you will need pyinstaller:
+
+```
+pip install pyinstaller
+```
+
+
+Once this works, you may want to track your projects python dependencies.  To do this, run:
+
+```
+pip freeze > requirements.txt
+```
+
+TIP: It is important to keep your `requirments.txt` updated.  Run this command frequently - if possible, whenever you install a new python module in your folder.
+
+
+If you, or another developer,  checks out the project on another machine, it is easy to get all of the python requirements installed using:
+
+```
+pip install -r requirements.txt
+```
+
+== Initial Application
+
+Crete a new file in the project root named `app.py`.
+
+.app.py
+```
+
+import eel
+
+if __name__ == "__main__":
+    eel.init("htdist")
+    eel.start("index.html")
+
+```
+
