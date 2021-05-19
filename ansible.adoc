@@ -1,3 +1,49 @@
 = Ansible 
 
-(coming soon)
+== Installation (Ubuntu/Debian/Apt)
+
+```
+sudo apt install ansible -y
+```
+
+== Configuration
+
+Ansible looks for configuration files:
+
+* $ANSIBLE_CONFIG
+* ./ansible.cfg
+* /etc/ansible.cfg
+
+== Hosts
+
+The hosts file contains groups of hosts which can be used to execute ansible commands.
+
+The following sample shows how to configure a group of hosts and variables
+related to those hosts.
+
+.Sample hosts File
+```
+[linux]
+162.9.9.9
+162.9.9.10
+
+[linux:vars]
+ansible_user=ansible
+ansible_ssh_private_key_file=ansible_ed25519
+```
+
+To keep various configurations separate, it's easy enough to create
+subdirectories, and include their own ansible.cfg and hosts file.
+
+== Running Ad-hoc Commands
+
+Arbitrary commands can be run using the ansible command with the `-a` parameter.
+
+```
+ansible linux -a "uptime"
+```
+
+== Playbook Files
+
+This is the preferred way to run ansible commands.
+
