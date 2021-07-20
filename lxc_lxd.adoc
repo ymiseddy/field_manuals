@@ -1,0 +1,277 @@
+= LXC/LXD Field Manual
+
+== Links
+
+* link:https://linuxcontainers.org/lxd/introduction/[Linux Containers Overview]
+* link:https://www.youtube.com/watch?v=aIwgPKkVj8s&t=99s[LearnLinuxTv Tutorial]
+
+
+== What is (LXD)
+- Container Manager
+- Allwos you to run Linux Containers (LXC)
+- Gives additional features like clusters
+
+LXC Containers are more VM like than Docker - maintains state.
+
+
+== Setup
+
+Most of the commands will need to be run as root/prefixed with sudo.
+
+=== Install
+```
+apt install lxd
+```
+
+=== Intialize
+
+Interactive LXD initialization (it asks you quesitons):
+
+```
+lxd init
+```
+
+== General Tools
+
+=== List/search Images
+
+Dumps all images:
+```
+lxc list images:
+```
+
+Keyword search (debian in example):
+```
+lxc list images: debian
+```
+
+== Container Management
+
+=== List Running containers
+
+```
+lxc list
+```
+
+=== Launch a new container
+
+The following launches a new container named 'mycoolserver' running ubuntu
+focal.
+
+```
+lxc launch images:ubuntu/focal mycoolserver
+```
+
+=== Execute a command in the container
+
+```
+lxc exec mycoolserver -- ls -la /
+```
+
+=== Stop a container
+
+```
+lxc stop mycoolserver
+```
+
+=== Start a container
+
+```
+lxc start mycoolserver
+```
+
+=== Restart a container
+
+```
+lxc restart mycoolserver
+```
+
+=== Delete a container
+
+The container must be stopped before deleting.
+
+```
+lxc delete mycoolserver
+```
+
+=== Snapshot a container
+
+The following creates a new snapshot named snapshot1:
+
+```
+lxc snapshot mycoolserver snapshot1
+```
+
+=== Info on a container (including snapshots)
+
+```
+lxc info mycoolserver
+```
+
+=== Delete a snapshot
+
+```
+lxc delete mycoolserver/snapshot1
+```
+
+=== Restore a snapshot
+
+```
+lxc restore mycoolserver snapshot1
+```
+
+=== Set to autostart on boot
+
+```
+lxc config set mycoolserver boot.autostart 1
+```
+
+=== Set memory ceiling
+
+```
+lxc config set mycoolserver limits.memory 1GB
+```
+
+=== Show config settings on a contianer
+
+```
+lxc config show mycoolserver
+```
+
+=== Controlling startup order
+
+Delay 30 seconds before starting:
+```
+lxc config set mycoolserver boot.autostart.delay 30
+```
+
+Controlling order of startup:
+
+Here, 4 is just a number indicating startup priority (lower values start before
+higher values).
+
+```
+lxc config set mycoolserver boot.autostart.order 4
+```
+
+== Creating a macvlan profile (for bridging onto lan)
+
+Macvlan bridging is the easiest for of bridging, but has some drawbacks.
+
+WARNING: Using this method, the host and container will not be able to communicate with one another directly over the network.
+
+NOTE: this will likely not work if your machine is using wireless. 
+
+NOTE: below, `macvlan` is an arbitrary name.  
+
+
+
+```
+lxc profile create macvlan
+```
+
+We need to get the parent of the `macvlan` nic run the ip route command: 
+
+```
+ip route show default 0.0.0.0/0
+
+```
+This will output something like:
+```
+default via 192.168.1.1 dev enp9s0 proto dhcp metric 100 
+```
+
+The `enp9s0` is the value we're interested in.  Include that in the parent in
+the following command (note: eth0 is refering to the device on the container,
+not the host):
+
+```
+lxc profile device add macvlan eth0 nic nictype=macvlan parent=enp9s0
+```
+
+=== Launching a container with the profile
+
+Note: you can specify multiple profiles for a container launch.
+
+```
+lxc launch images:ubuntu/focal mynetworkserver --profile default --profile macvlan
+```
+
+After launching the new instance, it will have an IP on your host network:
+```
+lxc list
++-----------------+---------+----------------------+-----------------------------------------------+-----------+-----------+
+|      NAME       |  STATE  |         IPV4         |                     IPV6                      |   TYPE    | SNAPSHOTS |
++-----------------+---------+----------------------+-----------------------------------------------+-----------+-----------+
+| mycoolserver    | RUNNING | 10.159.221.23 (eth0) | fd42:2a1a:8fd1:fc13:216:3eff:fec2:ece2 (eth0) | CONTAINER | 0         |
++-----------------+---------+----------------------+-----------------------------------------------+-----------+-----------+
+| mynetworkserver | RUNNING | 192.168.1.193 (eth0) |                                               | CONTAINER | 0         |
++-----------------+---------+----------------------+-----------------------------------------------+-----------+-----------+
+```
+
+== Bridging 
+
+This method is slightly more complicated than `macvlan` but has the benefit of allowing the host and clients to communicate. 
+
+=== Install bridge-utils
+
+```
+apt install bridge-utils
+```
+
+=== Creating the netplan
+
+In `/etc/netplan/`  add a `config.yaml` file as follows be sure to replace the
+instances of `enp1s0` with your NIC:
+
+```
+network:
+  version: 2
+  renderer: networkd
+  ethernets:
+    enp1s0:
+      dhcp4: yes
+  bridges:
+    br0:
+      dhcp4: yes
+      interfaces:
+	     - enp1s0
+```
+
+
+To get yoru NIC identifier use:
+
+```
+ip route show default 0.0.0.0/0
+```
+This will output something like:
+```
+default via 192.168.1.1 dev enp9s0 proto dhcp metric 100 
+```
+
+The `enp9s0` is the value we're interested in.  Include that in the parent in
+the following command.
+
+=== Adding the bridge profile
+
+Create a profile for bridging:
+
+```
+lxc profile create bridgedprofile
+```
+
+Add the bridge device to the profile.   
+
+NOTE: br0 is the bridge created in the previous step and eth0 is the device name on the container.
+
+```
+lxc profile device add bridgedprofile eth0 nic nictype=bridged parent=br0
+```
+
+=== Launching a container with the profile
+
+Note: you can specify multiple profiles for a container launch.
+
+```
+lxc launch images:ubuntu/focal mybridgedserver --profile default --profile bridgeprofile
+```
