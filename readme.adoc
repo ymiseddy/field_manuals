@@ -8,3 +8,6 @@
 - link:docker.adoc[Docker Commands]
 - link:ansible.adoc[Ansible] (in the works)
 - link:kubernetes.adoc[Kubernetes] (coming soon)
+- link:lxc_lxd.adoc[Linux Containers with LXC/LXD]
+
+
