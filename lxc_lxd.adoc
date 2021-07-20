@@ -7,12 +7,17 @@
 
 
 == What is (LXD)
-- Container Manager
-- Allwos you to run Linux Containers (LXC)
-- Gives additional features like clusters
 
-LXC Containers are more VM like than Docker - maintains state.
+LXD is a manager for Linux containers (LXC).   
 
+Linux containers have some similarities with docker containers and virtual
+machines.   Like docker containers, Linux containers are light weight, share
+the common kernel with the host; start quickly, stop quickly.
+
+Unlike docker, Linux containers are persistent - meaning when you stop the
+container, everything on it persists - similar to a virtual machine.
+Additionally, you can create snapshots from Linux containers as well as build
+base images from them.
 
 == Setup
 
