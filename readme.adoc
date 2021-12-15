@@ -1,5 +1,20 @@
 = Field Manual Repository
 
+== Purpose
+
+Field manuals sit somewhere between cheatsheets and full manuals.  Sometimes,
+cheatsheets are useful, but they require a base knowledge of the application or
+framework to use them effectively.  Manuals or full documentation is useful to
+get a deep understanding of a subject, but can be a bit daunting when you are
+first learning.
+
+Field manuals are intended to give you a quick overview of a framework,
+application or infrastructure - the main concepts required to start working.
+
+== General Development
+
+- Git
+
 == Javascript/UI Field Manuals
 - link:eel_vue_vite.adoc[Desktop App with Vue, Eel and Vite]
 

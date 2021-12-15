@@ -1,0 +1,26 @@
+= Alembic Field Manual
+
+== General Operations
+
+=== Initialize
+
+=== Create a Migration
+
+=== Update Database
+
+=== Downgrade Database
+
+== Migrations
+
+=== Create Tables
+
+=== Drop Tables
+
+=== Add Index
+
+=== Remove Index
+
+=== Add Foreign Keys
+
+
+== 
