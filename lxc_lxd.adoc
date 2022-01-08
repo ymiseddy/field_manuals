@@ -278,5 +278,5 @@ lxc profile device add bridgedprofile eth0 nic nictype=bridged parent=br0
 Note: you can specify multiple profiles for a container launch.
 
 ```
-lxc launch images:ubuntu/focal mybridgedserver --profile default --profile bridgeprofile
+lxc launch images:ubuntu/focal mybridgedserver --profile default --profile bridgedprofile
 ```
